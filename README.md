@@ -1,4 +1,4 @@
-# 🔬 RBC Detector — Automatic Red Blood Cell Detection & Counting
+# RBC Detector — Automatic Red Blood Cell Detection & Counting
 ### Classical Computer Vision · OpenCV only · 
 ---
 
@@ -69,48 +69,7 @@ python generate_sample.py
 
 ---
 
-## Pipeline Explained
 
-| Step | Function | Purpose |
-|------|----------|---------|
-| 1 | `load_image` | Read BGR image from disk |
-| 2 | `to_gray` | BGR → grayscale (luminance only) |
-| 3 | `blur` | Gaussian blur — suppress high-freq noise |
-| 4 | `threshold` | Otsu or manual → binary mask (cells = white) |
-| 5 | `morphology` | Erosion → Dilation → Opening → Closing |
-| 6a | `distance_transform` | Euclidean distance from each foreground px to background |
-| 6b | `watershed` | Separate touching cells using topographic flooding |
-| 7 | `detect_contours` | Find, filter (area + circularity), count, annotate |
-
----
-
-## Configurable Parameters
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `blur_ksize` | 7 | Gaussian kernel size (must be odd) |
-| `use_otsu` | True | Auto-threshold vs manual |
-| `threshold_value` | 128 | Manual threshold (0–255) |
-| `morph_kernel_size` | 3 | Structuring element size |
-| `morph_iterations` | 2 | Erosion/dilation repetitions |
-| `min_cell_area` | 400 | Minimum contour area (px²) |
-| `max_cell_area` | 8000 | Maximum contour area (px²) |
-| `min_circularity` | 0.55 | 4π·A/P² (1 = perfect circle) |
-| `use_watershed` | True | Enable watershed separation |
-| `dist_threshold` | 0.5 | Fraction of dist-max for sure-foreground |
-
----
-
-## Known Limitations
-
-1. **Lighting sensitivity** — Otsu assumes bimodal histogram; uneven illumination degrades results
-2. **Dense cell clusters** — Watershed peaks merge when ≥3 cells overlap heavily
-3. **Fixed shape filter** — Abnormal cells (sickle, macrocytes) may be discarded
-4. **Stain/scope dependence** — Parameters must be re-tuned for different imaging protocols
-5. **No ground truth** — Quantitative accuracy (precision/recall) requires labelled data
-6. **Processing time** — Watershed is ~2–5× slower than direct contour detection
-
----
 
 ## Dependencies
 
@@ -123,20 +82,5 @@ python generate_sample.py
 | `tkinter` | stdlib | GUI (ships with Python) |
 
 ---
-
-## Academic Notes
-
-This project satisfies the following university CV curriculum requirements:
-
-- ✅ Classical pipeline (no ML/DL)
-- ✅ Gaussian blur, Otsu threshold, morphological operations (erosion, dilation, opening, closing)
-- ✅ Distance transform + Watershed for overlapping cell separation
-- ✅ Contour detection + area/circularity filtering
-- ✅ GUI with sliders, toggles, before/after display
-- ✅ Execution time measurement
-- ✅ Multi-image batch testing
-- ✅ Watershed vs no-watershed comparison
-- ✅ Documented limitations
-- ✅ Modular, commented code
 
 
