@@ -1,0 +1,142 @@
+# 🔬 RBC Detector — Automatic Red Blood Cell Detection & Counting
+### Classical Computer Vision · OpenCV only · 
+---
+
+## Project Structure
+
+```
+rbc_detector/
+├── rbc_detector.py      ← Core pipeline (load → detect → count)
+├── gui.py               ← Tkinter GUI application
+├── analysis.py          ← Batch performance analysis & comparison
+├── generate_sample.py   ← Synthetic test-image generator
+├── requirements.txt     ← Python dependencies
+└── README.md            ← This file
+```
+
+---
+
+## Installation
+
+**Python 3.10+ required.**
+
+```bash
+# 1. Clone / unzip the project folder
+cd rbc_detector
+
+# 2. (Recommended) create a virtual environment
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+```
+
+---
+
+## Quick Start
+
+### A) GUI Application (recommended)
+```bash
+python gui.py
+```
+1. Click **Open Image** → select a microscopy image (JPG/PNG/TIFF)
+2. Adjust sliders (blur, threshold, morphological kernel, area/circularity filters)
+3. Toggle **Watershed** on/off
+4. Click **▶ Run Pipeline**
+5. Navigate intermediate steps with the tab buttons at the top
+6. Click **⚖ Compare ±Watershed** to see both results side-by-side
+7. Click **💾 Save Result** to export the annotated image
+
+### B) Command-line (single image)
+```bash
+python rbc_detector.py path/to/image.jpg
+```
+Displays a 6-panel Matplotlib figure and saves `rbc_result.png`.
+
+### C) Batch analysis
+```bash
+# Single image
+python analysis.py path/to/image.jpg
+
+
+
+### D) Generate a synthetic test image
+```bash
+python generate_sample.py
+# → saves sample_rbc.jpg in the current directory
+```
+
+---
+
+## Pipeline Explained
+
+| Step | Function | Purpose |
+|------|----------|---------|
+| 1 | `load_image` | Read BGR image from disk |
+| 2 | `to_gray` | BGR → grayscale (luminance only) |
+| 3 | `blur` | Gaussian blur — suppress high-freq noise |
+| 4 | `threshold` | Otsu or manual → binary mask (cells = white) |
+| 5 | `morphology` | Erosion → Dilation → Opening → Closing |
+| 6a | `distance_transform` | Euclidean distance from each foreground px to background |
+| 6b | `watershed` | Separate touching cells using topographic flooding |
+| 7 | `detect_contours` | Find, filter (area + circularity), count, annotate |
+
+---
+
+## Configurable Parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `blur_ksize` | 7 | Gaussian kernel size (must be odd) |
+| `use_otsu` | True | Auto-threshold vs manual |
+| `threshold_value` | 128 | Manual threshold (0–255) |
+| `morph_kernel_size` | 3 | Structuring element size |
+| `morph_iterations` | 2 | Erosion/dilation repetitions |
+| `min_cell_area` | 400 | Minimum contour area (px²) |
+| `max_cell_area` | 8000 | Maximum contour area (px²) |
+| `min_circularity` | 0.55 | 4π·A/P² (1 = perfect circle) |
+| `use_watershed` | True | Enable watershed separation |
+| `dist_threshold` | 0.5 | Fraction of dist-max for sure-foreground |
+
+---
+
+## Known Limitations
+
+1. **Lighting sensitivity** — Otsu assumes bimodal histogram; uneven illumination degrades results
+2. **Dense cell clusters** — Watershed peaks merge when ≥3 cells overlap heavily
+3. **Fixed shape filter** — Abnormal cells (sickle, macrocytes) may be discarded
+4. **Stain/scope dependence** — Parameters must be re-tuned for different imaging protocols
+5. **No ground truth** — Quantitative accuracy (precision/recall) requires labelled data
+6. **Processing time** — Watershed is ~2–5× slower than direct contour detection
+
+---
+
+## Dependencies
+
+| Library | Version | Role |
+|---------|---------|------|
+| `opencv-python` | ≥ 4.8 | All CV operations |
+| `numpy` | ≥ 1.24 | Array maths |
+| `Pillow` | ≥ 10.0 | Tkinter image bridge |
+| `matplotlib` | ≥ 3.7 | CLI visualisation (optional) |
+| `tkinter` | stdlib | GUI (ships with Python) |
+
+---
+
+## Academic Notes
+
+This project satisfies the following university CV curriculum requirements:
+
+- ✅ Classical pipeline (no ML/DL)
+- ✅ Gaussian blur, Otsu threshold, morphological operations (erosion, dilation, opening, closing)
+- ✅ Distance transform + Watershed for overlapping cell separation
+- ✅ Contour detection + area/circularity filtering
+- ✅ GUI with sliders, toggles, before/after display
+- ✅ Execution time measurement
+- ✅ Multi-image batch testing
+- ✅ Watershed vs no-watershed comparison
+- ✅ Documented limitations
+- ✅ Modular, commented code
+
+
